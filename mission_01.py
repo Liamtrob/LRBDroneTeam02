@@ -15,15 +15,25 @@ from headsupflight import HeadsUpTello
 
 # Two ways of storing the same logo... second one is easier to see, right?
 huf_logo1 = "000**000000**0000******00******0000**000000**000000**000000**000"
-huf_logo2 = "000**000" +\
-            "000**000" +\
-            "0******0" +\
-            "0******0" +\
-            "000**000" +\
-            "000**000" +\
-            "000**000" +\
-            "000**000"
+huf_logo2 = "00000rrr" +\
+            "0bbb0r0r" +\
+            "0b00brrr" +\
+            "pbbb0r0r" +\
+            "pb0b0rrr" +\
+            "pb00b000" +\
+            "p0000000" +\
+            "pppp0000"
 
+
+huf_logo3 = "00000000" +\
+            "00000000" +\
+            "00000000" +\
+            "00000000" +\
+            "00000000" +\
+            "00000000" +\
+            "00000000" +\
+            "00000000"
+0
 
 #-------------------------------------------------------------------------------
 # Mission Programs
@@ -43,7 +53,7 @@ def mission_01():
     drone = HeadsUpTello(my_robomaster, logging.WARNING)
 
     # Turn the top LED bright green and show our logo on the matrix display
-    drone.matrix_pattern(huf_logo1, 'b')
+    drone.matrix_pattern(huf_logo2, 'b')
     r = 0
     g = 200
     b = 50
