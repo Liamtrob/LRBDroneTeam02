@@ -598,7 +598,6 @@ class DroneSim:
                     self.move_back(length)
                     self.move_right(width)
                 elif 180 < self.curr_degrees < 360 and self.x_distance > 0 and self.y_distance > 0: #upper right quadrant
-                    print("in upper right")
                     self.move_back(length)
                     self.move_right(width)
                 else: #lower right quadrant
@@ -606,26 +605,21 @@ class DroneSim:
                     self.move_left(width)        
         else: #direct flight
             distance_to = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
-            angle_to = math.degrees(math.tan(y_coord/x_coord))
-            print("ANGLE TO IS", angle_to)
+            angle_to = round(math.degrees(math.tan(y_coord/x_coord)), 0)
             if x_coord > 0 and y_coord > 0: #flying to upper left quadrant
                 to_rotate = 90 - angle_to 
                 self.rotate_counter_clockwise(to_rotate)
-                print("DISTANCE TO IS", distance_to)
                 self.move_forward(distance_to)
             elif x_coord > 0 and y_coord < 0: #flying to upper right quadrant
-                print("going to upper right")
                 to_rotate = 90 + angle_to
                 self.rotate_clockwise(to_rotate)
                 self.move_forward(distance_to)
             elif x_coord < 0 and y_coord < 0: #flying to lower right quadrant
                 to_rotate = 180 + angle_to
-                print("TO ROTATE IS", to_rotate)
                 self.rotate_counter_clockwise(to_rotate)
                 self.move_forward(distance_to)
             else: #flying to lower left quadrant
                 to_rotate = 180 - angle_to
-                print("TO ROTATE IS", to_rotate)
                 self.rotate_clockwise(to_rotate)
                 self.move_forward(distance_to)
 
