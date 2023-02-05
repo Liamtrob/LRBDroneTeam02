@@ -2,6 +2,7 @@ import logging
 import random
 import time
 import math
+import numpy
 
 def _approximate(value):
     rand_10pct = value // 10
@@ -169,7 +170,7 @@ class DroneSim:
             self.y_distance -= (math.sin(math.radians(self.curr_degrees)) * value_cm)
         elif 270 < self.curr_degrees < 360: #drone has rotated and is facing upper right quadrant
             self.x_distance += (math.cos(math.radians(self.curr_degrees)) * value_cm)
-            self.y_distance -= (math.sin(math.radians(self.curr_degrees)) * value_cm)
+            self.y_distance += (math.sin(math.radians(self.curr_degrees)) * value_cm)
         elif self.curr_degrees == 0: #drone is not rotated facing forward 
             self.x_distance += value_cm
             self.y_distance += 0
@@ -603,15 +604,40 @@ class DroneSim:
                     self.move_back(length)
                     self.move_left(width)        
         else: #direct flight
-            angle_to = math.atan(x_coord,y_coord)
+            distance_to = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
+            angle_to = math.degrees(math.tan(y_coord/x_coord))
+            print("ANGLE TO IS", angle_to)
+            if x_coord > 0 and y_coord > 0: #flying to upper left quadrant
+                to_rotate = 90 - angle_to 
+                self.rotate_counter_clockwise(to_rotate)
+                print("DISTANCE TO IS", distance_to)
+                self.move_forward(distance_to)
+            elif x_coord > 0 and y_coord < 0: #flying to upper right quadrant
+                print("going to upper right")
+                to_rotate = 90 + angle_to
+                self.rotate_clockwise(to_rotate)
+                self.move_forward(distance_to)
+            elif x_coord < 0 and y_coord < 0: #flying to lower right quadrant
+                to_rotate = 180 + angle_to
+                print("TO ROTATE IS", to_rotate)
+                self.rotate_counter_clockwise(to_rotate)
+                self.move_forward(distance_to)
+            else: #flying to lower left quadrant
+                to_rotate = 180 - angle_to
+                print("TO ROTATE IS", to_rotate)
+                self.rotate_clockwise(to_rotate)
+                self.move_forward(distance_to)
+
 
 if __name__ == "__main__":
     drone = DroneSim()
     drone.connect()
     drone.takeoff()
-    drone.rotate_counter_clockwise(45)
-    drone.move_forward(5)
-    drone.move_left(7)
+    drone.fly_to_coordinates(400, 300, True)
+    #drone.fly_home(0,0)
+    #drone.rotate_counter_clockwise(37)
+    #drone.move_forward(5)
+    #drone.move_left(7)
     print(drone.x_distance)
     print(drone.y_distance)
     '''drone.rotate_counter_clockwise(45)
