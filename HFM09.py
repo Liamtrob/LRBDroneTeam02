@@ -581,7 +581,7 @@ class HighFlyers():
                     self.fly_left(width)        
         else: #direct flight
             distance_to = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
-            angle_to = round(math.degrees(math.tan(y_coord/x_coord)), 0)
+            angle_to = round(math.degrees(math.atan(y_coord/x_coord)), 0)
             if x_coord > 0 and y_coord > 0: #flying to upper left quadrant
                 to_rotate = 90 - angle_to 
                 self.rotate_ccw(to_rotate)
