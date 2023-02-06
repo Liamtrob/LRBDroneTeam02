@@ -17,7 +17,7 @@ if __name__ == "__main__":
     #drone.rotate_counter_clockwise(37)
     #drone.move_forward(5)
     #drone.move_left(7)
-    print(drone.x_distance)
-    print(drone.y_distance)
-    print(drone.curr_degrees)
+    #print(drone.x_distance)
+    #print(drone.y_distance)
+    #print(drone.curr_degrees)
 
