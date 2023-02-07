@@ -159,30 +159,17 @@ class DroneSim:
         delay = (value_cm // 100) + 2 * random.random()
         time.sleep(delay)
         self._battery_level -= 1
-        if 0 < self.curr_degrees < 90: #drone has rotated facing upper left quadrant
-            self.x_distance += (math.cos(math.radians(self.curr_degrees)) * value_cm)
-            self.y_distance += (math.sin(math.radians(self.curr_degrees)) * value_cm)
-            print('ADDING TO X_DISTANCE', math.cos(math.radians(self.curr_degrees)) * value_cm)
-        elif 90 < self.curr_degrees < 180: #drone has rotated and is facing lower left quadrant
-            self.x_distance -= (math.cos(math.radians(self.curr_degrees)) * value_cm)
-            self.y_distance += (math.sin(math.radians(self.curr_degrees)) * value_cm)
-        elif 180 < self.curr_degrees < 270: #drone has rotated and is facing lower right quadrant
-            self.x_distance -= (math.cos(math.radians(self.curr_degrees)) * value_cm)
-            self.y_distance -= (math.sin(math.radians(self.curr_degrees)) * value_cm)
-        elif 270 < self.curr_degrees < 360: #drone has rotated and is facing upper right quadrant
-            self.x_distance += (math.cos(math.radians(self.curr_degrees)) * value_cm)
-            self.y_distance += (math.sin(math.radians(self.curr_degrees)) * value_cm)
-        elif self.curr_degrees == 0: #drone is not rotated facing forward 
-            self.x_distance += value_cm
-            self.y_distance += 0
-        elif self.curr_degrees == 180: #drone is facing backwards
-            self.x_distance -= value_cm
-            self.y_distance += 0
-        elif self.curr_degrees == 90: #drone is facing exactly left. x position won't change when moving forward
-            self.x_distance += 0
-            self.y_distance += value_cm
-        else: #drone is facing exactly right. x position won't change when moving forward
-            self.y_distance -= value_cm
+        if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
+            self.x_distance += round(abs(math.cos(math.radians(self.curr_degrees)) * value_cm),0)
+        elif 0 < self.curr_degrees < 180: #drone has rotated but is still facing left/positive y direction
+            self.x_distance -= round(abs(math.cos(math.radians(self.curr_degrees)) * value_cm),0)
+        elif 180 < self.curr_degrees < 270: #drone has rotated and is facing lower right direction
+            self.x_distance -= round(abs(math.cos(math.radians(self.curr_degrees)) * value_cm),0)
+        
+        if 0 < self.curr_degrees < 180: #drone is going left. adding to y distance
+            self.y_distance += round(abs(math.sin(math.radians(self.curr_degrees)) * value_cm),0)
+        elif 180 < self.curr_degrees < 360: #drone is going right. subtracting from y distance
+            self.y_distance -= round(abs(math.sin(math.radians(self.curr_degrees)) * value_cm),0)
         # Log message
         print(f">> MOVED FORWARD {value_cm}cm <<")
         return
@@ -199,31 +186,16 @@ class DroneSim:
         delay = abs(value_cm // 100) + 2 * random.random()
         time.sleep(delay)
         self._battery_level -= 1
-        if 0 < self.curr_degrees < 90: #drone has rotated facing upper left quadrant
-            self.x_distance -= (math.cos(math.radians(self.curr_degrees)) * value_cm)
-            self.y_distance -= (math.sin(math.radians(self.curr_degrees)) * value_cm)
-            print('ADDING TO X_DISTANCE', math.cos(math.radians(self.curr_degrees)) * value_cm)
-        elif 90 < self.curr_degrees < 180: #drone has rotated and is facing lower left quadrant
-            self.x_distance += (math.cos(math.radians(self.curr_degrees)) * value_cm)
-            self.y_distance -= (math.sin(math.radians(self.curr_degrees)) * value_cm)
-        elif 180 < self.curr_degrees < 270: #drone has rotated and is facing lower right quadrant
-            self.x_distance += (math.cos(math.radians(self.curr_degrees)) * value_cm)
-            self.y_distance += (math.sin(math.radians(self.curr_degrees)) * value_cm)   
-        elif 270 < self.curr_degrees < 360: #drone has rotated and is facing upper right quadrant
-            self.x_distance -= (math.cos(math.radians(self.curr_degrees)) * value_cm)
-            self.y_distance += (math.sin(math.radians(self.curr_degrees)) * value_cm)
-        elif self.curr_degrees == 0: #drone is not rotated facing forward 
-            self.x_distance -= value_cm
-            self.y_distance += 0
-        elif self.curr_degrees == 180: #drone is facing backwards
-            self.x_distance += value_cm
-            self.y_distance += 0
-        elif self.curr_degrees == 90: #drone is facing exactly left. x position won't change when moving back
-            self.x_distance += 0
-            self.y_distance -= value_cm
-        else: #drone is facing exactly right. x position wont change when moving back
-            self.x_distance += 0
-            self.y_distance += value_cm
+        angle = self.curr_degrees + 180
+        if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
+            self.x_distance += round(abs(math.cos(math.radians(self.curr_degrees)) * value_cm),0)
+        elif 0 < self.curr_degrees < 180: #drone has rotated but is still facing left/positive y direction
+            self.x_distance -= round(abs(math.cos(math.radians(self.curr_degrees)) * value_cm),0)
+        
+        if 0 < self.curr_degrees < 180:
+            self.y_distance += round(abs(math.sin(math.radians(self.curr_degrees)) * value_cm),0)
+        elif 180 < self.curr_degrees < 360:
+            self.y_distance -= round(abs(math.sin(math.radians(self.curr_degrees)) * value_cm),0)
         # Log message
         print(f">> MOVED BACK {value_cm}cm <<")
         return
@@ -239,29 +211,16 @@ class DroneSim:
         delay = (value_cm // 100) + 2 * random.random()
         time.sleep(delay)
         self._battery_level -= 1
-        if 0 < self.curr_degrees < 90: #drone has rotated facing upper left quadrant
-            self.y_distance += (math.sin(math.radians(self.curr_degrees)) * value_cm)
-            self.x_distance -= (math.cos(math.radians(self.curr_degrees)) * value_cm)
-            print('ADDING TO Y_DISTANCE', math.cos(math.radians(self.curr_degrees)) * value_cm)
-        elif 90 < self.curr_degrees < 180: #drone has rotated and is facing lower left quadrant
-            self.y_distance -= (math.sin(math.radians(self.curr_degrees)) * value_cm)
-            self.x_distance -= (math.cos(math.radians(self.curr_degrees)) * value_cm)
-        elif 180 < self.curr_degrees < 270: #drone has rotated and is facing lower right quadrant
-            self.y_distance += (math.sin(math.radians(self.curr_degrees)) * value_cm)
-            self.x_distance += (math.cos(math.radians(self.curr_degrees)) * value_cm)
-        elif 270 < self.curr_degrees < 360: #drone has rotated and is facing upper right quadrant
-            self.y_distance -= (math.sin(math.radians(self.curr_degrees)) * value_cm)
-            self.x_distance += (math.cos(math.radians(self.curr_degrees)) * value_cm)
-        elif self.curr_degrees == 0: #drone is not rotated facing forward 
-            self.y_distance += value_cm
-        elif self.curr_degrees == 180: #drone is facing backwards
-            self.y_distance -= value_cm
-        elif self.curr_degrees == 90: #drone is facing exactly left. y position won't change but x will
-            self.y_distance += 0
-            self.x_distance -= value_cm
-        else: #drone is facing directly right. y position wont change but x will
-            self.y_distance += 0
-            self.x_distance += value_cm
+        angle = self.curr_degrees + 90
+        if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
+            self.x_distance += round(abs(math.cos(math.radians(angle)) * value_cm),0)
+        elif 0 < self.curr_degrees < 180: #drone has rotated but is still facing left/positive y direction
+            self.x_distance -= round(abs(math.cos(math.radians(angle)) * value_cm),0)
+        
+        if 0 < self.curr_degrees < 180:
+            self.y_distance += round(abs(math.sin(math.radians(angle)) * value_cm),0)
+        elif 180 < self.curr_degrees < 360:
+            self.y_distance -= round(abs(math.sin(math.radians(angle)) * value_cm),0)
         # Log message
         print(f">> MOVED LEFT {value_cm}cm <<")
         return
@@ -277,40 +236,28 @@ class DroneSim:
         delay = (value_cm // 100) + 2 * random.random()
         time.sleep(delay)
         self._battery_level -= 1
-        if 0 < self.curr_degrees < 90: #drone has rotated facing upper left quadrant
-            self.y_distance -= (math.sin(math.radians(self.curr_degrees)) * value_cm)
-            self.x_distance += (math.cos(math.radians(self.curr_degrees)) * value_cm)
-            print('ADDING TO Y_DISTANCE', math.cos(math.radians(self.curr_degrees)) * value_cm)
-        elif 90 < self.curr_degrees < 180: #drone has rotated and is facing lower left quadrant
-            self.y_distance += (math.sin(math.radians(self.curr_degrees)) * value_cm)
-            self.x_distance += (math.cos(math.radians(self.curr_degrees)) * value_cm)
-        elif 180 < self.curr_degrees < 270: #drone has rotated and is facing lower right quadrant
-            self.y_distance += (math.sin(math.radians(self.curr_degrees)) * value_cm)
-            self.x_distance -= (math.cos(math.radians(self.curr_degrees)) * value_cm)
-        elif 270 < self.curr_degrees < 360: #drone has rotated and is facing upper right quadrant
-            self.y_distance -= (math.sin(math.radians(self.curr_degrees)) * value_cm)
-            self.x_distance -= (math.cos(math.radians(self.curr_degrees)) * value_cm)
-        elif self.curr_degrees == 0: #drone is not rotated facing forward 
-            self.y_distance -= value_cm
-        elif self.curr_degrees == 180: #drone is facing backwards
-            self.y_distance += value_cm
-        elif self.curr_degrees == 90: #drone is facing exactly left. y position won't change but x will
-            self.y_distance += 0
-            self.x_distance += value_cm
-        else: #drone is facing directly right. y position wont change but x will
-            self.y_distance += 0
-            self.x_distance -= value_cm
+        angle = self.curr_degrees + 270
+        if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
+            self.x_distance += round(abs(math.cos(math.radians(angle)) * value_cm),0)
+        elif 0 < self.curr_degrees < 180: #drone has rotated but is still facing left/positive y direction
+            self.x_distance -= round(abs(math.cos(math.radians(angle)) * value_cm),0)
+        
+        if 0 < self.curr_degrees < 180:
+            self.y_distance += round(abs(math.sin(math.radians(angle)) * value_cm),0)
+        elif 180 < self.curr_degrees < 360:
+            self.y_distance -= round(abs(math.sin(math.radians(angle)) * value_cm),0)
         # Log message
         print(f">> MOVED RIGHT {value_cm}cm <<")
         return
 
 
     def rotate_counter_clockwise(self, degrees):
+        print("IN ROTATE COUNTER CLOCKWISE")
         # Verify drone state
         if self._connected == False:
             raise RuntimeError(f"Cannot ROT CCW b/c drone is not connected")
         if self._grounded == True:
-            raise RuntimeError(f"Cannot ROT CCW b/c drone is grounded")
+            raise RuntimeError(f"Cannot ROT CCW b/c drone is grounded")       
         self.curr_degrees += degrees
         self.curr_degrees = self.curr_degrees % 360
         # Simulate time delay
@@ -404,29 +351,14 @@ class DroneSim:
         except Exception as excp:
             self.log.warning("Cannot round degrees to a whole number")
 
-    def fly_home(self, drone, direct_flight = False):
-        if direct_flight == True:
-            direction = 'ccw'
-            if self.curr_degrees <= 180: #drone is facing forward or left side of coord plane
-                turn_degrees = 180 - self.curr_degrees
-                print('IN FLY HOME. DEGREES TO TURN IS ', turn_degrees)
-            else: #drone is facing right side of coord plane
-                direction = 'cw'
-                turn_degrees = self.curr_degrees - 180
-                distance_to_home = math.sqrt((self.curr_move ** 2) + (self.last_move ** 2) - (2 * self.curr_move * self.last_move * math.cos(math.radians(turn_degrees))))
-                print("DISTANCE TO HOME IS", distance_to_home)
-            if direction == 'ccw':
-                self.rotate_counter_clockwise(turn_degrees)
-                distance_to_home = math.sqrt((self.curr_move ** 2) + (self.last_move ** 2) - (2 * self.curr_move * self.last_move * math.cos(math.radians(turn_degrees))))
-                print("DISTANCE TO HOME IS", distance_to_home)
-                pyth_to_home = math.sqrt((self.x_distance**2) + (self.y_distance ** 2))
-                print("PYTH DISTANCE TO HOME IS", pyth_to_home)
-                drone.move_forward(distance_to_home, True)
+    def fly_home(self):
+        self.fly_to_coordinates(0,0,True)
+        self.rotate_to_bearing(0, True)
 
 
-    def rotate_to_bearing(self, degrees):
-        degrees_to_rotate = math.abs(degrees - self.curr_degrees)
-        if degrees_to_rotate > 180:
+    def rotate_to_bearing(self, degrees, home=False):
+        degrees_to_rotate = abs(degrees - self.curr_degrees)
+        if degrees_to_rotate > 180 and home == False:
             ccw_degrees = (degrees_to_rotate - 360) % 360
             self.rotate_counter_clockwise(ccw_degrees)
         else:
@@ -604,24 +536,50 @@ class DroneSim:
                     self.move_back(length)
                     self.move_left(width)        
         else: #direct flight
-            distance_to = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
-            angle_to = round(math.degrees(math.atan(x_coord/y_coord)), 0)
-            if x_coord > 0 and y_coord > 0: #flying to upper left quadrant
-                to_rotate = 90 - angle_to 
-                self.rotate_counter_clockwise(to_rotate)
-                self.move_forward(distance_to)
-            elif x_coord > 0 and y_coord < 0: #flying to upper right quadrant
-                to_rotate = 90 + angle_to
-                self.rotate_clockwise(to_rotate)
-                self.move_forward(distance_to)
-            elif x_coord < 0 and y_coord < 0: #flying to lower right quadrant
-                to_rotate = 180 + angle_to
-                self.rotate_counter_clockwise(to_rotate)
-                self.move_forward(distance_to)
-            else: #flying to lower left quadrant
-                to_rotate = 180 - angle_to
-                self.rotate_clockwise(to_rotate)
-                self.move_forward(distance_to)
+            if x_coord == 0 and y_coord == 0: #flying to home
+                distance_to = math.dist([self.x_distance, self.y_distance], [x_coord, y_coord])
+                if self.x_distance > 0 and self.y_distance > 0: #upper left quadrant flying to home
+                    self.rotate_to_bearing(0)
+                    self.rotate_counter_clockwise(180)
+                    angle_to = math.degrees(math.atan(self.y_distance/self.x_distance))
+                    self.rotate_counter_clockwise(angle_to)
+                    self.move_forward(distance_to)
+                elif self.x_distance > 0 and self.y_distance < 0: #upper right quadrant flying home
+                    self.rotate_to_bearing(0)
+                    self.rotate_counter_clockwise(90)
+                    angle_to = 90 - math.atan(self.x_distance/self.y_distance)
+                    self.rotate_counter_clockwise(angle_to)
+                    self.move_forward(distance_to)
+                elif self.x_distance < 0 and self.y_distance < 0: #lower right quadrant flying home
+                    self.rotate_to_bearing(0)
+                    angle_to = 90 - math.atan(self.x_distance/self.y_distance)
+                    self.rotate_counter_clockwise(angle_to)
+                    self.move_forward(distance_to)
+                else: #lower left quadrant flying home
+                    self.rotate_to_bearing(0)
+                    angle_to = 90 - math.atan(self.x_distance/self.y_distance)
+                    self.rotate_clockwise(angle_to)
+                    self.move_forward(distance_to)
+
+            else:
+                distance_to = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
+                angle_to = round(math.degrees(math.atan(x_coord/y_coord)), 0)
+                if x_coord > 0 and y_coord > 0: #flying to upper left quadrant
+                    to_rotate = 90 - angle_to 
+                    self.rotate_counter_clockwise(to_rotate)
+                    self.move_forward(distance_to)
+                elif x_coord > 0 and y_coord < 0: #flying to upper right quadrant
+                    to_rotate = 90 + angle_to
+                    self.rotate_clockwise(to_rotate)
+                    self.move_forward(distance_to)
+                elif x_coord < 0 and y_coord < 0: #flying to lower right quadrant
+                    to_rotate = 180 + angle_to
+                    self.rotate_counter_clockwise(to_rotate)
+                    self.move_forward(distance_to)
+                else: #flying to lower left quadrant
+                    to_rotate = 180 - angle_to
+                    self.rotate_clockwise(to_rotate)
+                    self.move_forward(distance_to)
 
 
 if __name__ == "__main__":
@@ -629,12 +587,15 @@ if __name__ == "__main__":
     drone.connect()
     drone.takeoff()
     drone.fly_to_coordinates(400, 300, True)
+    drone.fly_home()
+    #drone.fly_to_coordinates(0,0,True)
     #drone.fly_home(0,0)
     #drone.rotate_counter_clockwise(37)
     #drone.move_forward(5)
     #drone.move_left(7)
     print(drone.x_distance)
     print(drone.y_distance)
+    print(drone.curr_degrees)
     '''drone.rotate_counter_clockwise(45)
     drone.fly_to_coordinates(50, -40)
     print('CURR DEGREES IS__', drone.curr_degrees)
