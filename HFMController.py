@@ -149,7 +149,7 @@ class HighFlyers():
     #Fly forward/Fly Back min distance = 20cm
     def fly_forward(self, cm, home=False):
         self.pre_flight_check()
-        self.drone.fly_forward(int(cm))
+        self.drone.move_forward(int(cm))
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
             self.x_distance += round(abs(math.cos(math.radians(self.curr_degrees)) * cm),0)
         elif 0 < self.curr_degrees < 180: #drone has rotated but is still facing left/positive y direction
@@ -165,7 +165,7 @@ class HighFlyers():
         
     def fly_back(self,cm):
         self.pre_flight_check()
-        self.drone.fly_back(int(cm))
+        self.drone.move_back(int(cm))
         angle = self.curr_degrees + 180
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
             self.x_distance += round(abs(math.cos(math.radians(self.curr_degrees)) * cm),0)
@@ -180,7 +180,7 @@ class HighFlyers():
         
     def fly_left(self,cm):
         self.pre_flight_check()
-        self.drone.fly_left(int(cm))
+        self.drone.move_left(int(cm))
         angle = self.curr_degrees + 90
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
             self.x_distance += round(abs(math.cos(math.radians(angle)) * cm),0)
@@ -195,7 +195,7 @@ class HighFlyers():
         
     def fly_right(self,cm):
         self.pre_flight_check()
-        self.drone.fly_right(int(cm))
+        self.drone.move_right(int(cm))
         angle = self.curr_degrees + 270
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
             self.x_distance += round(abs(math.cos(math.radians(angle)) * cm),0)
@@ -208,13 +208,13 @@ class HighFlyers():
             self.y_distance -= round(abs(math.sin(math.radians(angle)) * cm),0)
         self.log.info(f"Drone succesfully flew right {cm} cm")
 
-    def rotate_cw(self, degrees):
-        self.drone.rotate_cw(int(degrees))
+    def rotate_clockwise(self, degrees):
+        self.drone.rotate_clockwise(int(degrees))
         self.curr_degrees = (self.curr_degrees - degrees) % 360
         self.log.info(f"Drone has rotated {degrees} clockwise")
 
-    def rotate_ccw(self, degrees):
-        self.drone.rotate_ccw(int(degrees))
+    def rotate_counter_clockwise(self, degrees):
+        self.drone.rotate_counter_clockwise(int(degrees))
         self.curr_degrees += degrees
         self.curr_degrees = self.curr_degrees % 360
         self.log.info(f"Drone has rotated {degrees} clockwise")
@@ -394,17 +394,17 @@ class HighFlyers():
         if direct_flight == False:
             if self.curr_degrees == 0 and self.x_distance == 0 and self.y_distance == 0: #flying to coordinates from start. drone is not rotated or moved
                 if x_coord > 0 and y_coord > 0: #coordinates are in upper left quadrant
-                    self.move_forward(x_coord - self.position_x)
-                    self.move_left(y_coord - self.position_y)
+                    self.fly_forward(x_coord - self.position_x)
+                    self.fly_left(y_coord - self.position_y)
                 elif x_coord < 0 and y_coord > 0: #coordinates are in lower left quadrant
-                    self.move_back(-x_coord)
-                    self.move_left(y_coord)
+                    self.fly_back(-x_coord)
+                    self.fly_left(y_coord)
                 elif x_coord < 0 and y_coord < 0: #coordinates are in lower right quadrant
-                    self.move_back(-x_coord)
-                    self.move_right(-y_coord)
+                    self.fly_back(-x_coord)
+                    self.fly_right(-y_coord)
                 elif x_coord > 0 and y_coord < 0: #coordinates are in upper right quadrant
-                    self.move_forward(x_coord)
-                    self.move_right(-y_coord)
+                    self.fly_forward(x_coord)
+                    self.fly_right(-y_coord)
             elif 0 < self.curr_degrees < 90 and self.x_distance == 0 and self.y_distance == 0: #flying to coordinates|drone is not moved and is rotated facing upper left quadrant
                 hypotenuse = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
                 beta = self.curr_degrees
@@ -413,29 +413,29 @@ class HighFlyers():
                 width = hypotenuse * math.sin(theta)
                 length = hypotenuse * math.cos(theta)
                 if x_coord > 0 and y_coord > 0: #going to upper left quadrant
-                    self.move_forward(length)
+                    self.fly_forward(length)
                     if y_coord > self.y_distance:
-                        self.move_left(width)
+                        self.fly_left(width)
                     else:
-                        self.move_right(width)
+                        self.fly_right(width)
                 elif x_coord < 0 and y_coord > 0: #going to lower left quadrant
-                    self.move_left(length)
+                    self.fly_left(length)
                     if y_coord > self.y_distance:
-                        self.move_forward(width)
+                        self.fly_forward(width)
                     else:
-                        self.move_back(width)
+                        self.fly_back(width)
                 elif x_coord > 0 and y_coord < 0: #going to upper right quadrant
-                    self.move_right(length)
+                    self.fly_right(length)
                     if y_coord > self.y_distance:
-                        self.move_forward(width)
+                        self.fly_forward(width)
                     else:
-                        self.move_back(width)
+                        self.fly_back(width)
                 else: #going to lower right quadrant
-                    self.move_back(length)
+                    self.fly_back(length)
                     if y_coord > self.y_distance:
-                        self.move_left(width)
+                        self.fly_left(width)
                     else:
-                        self.move_right(width)
+                        self.fly_right(width)
             elif 90 < self.curr_degrees < 180 and self.x_distance == 0 and self.y_distance == 0: #flying to coordinates|drone is not moved and is rotated facing lower left quadrant
                 hypotenuse = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
                 beta = self.curr_degrees
@@ -447,29 +447,29 @@ class HighFlyers():
                 width = math.sin(theta) * hypotenuse
                 length = math.sqrt((hypotenuse ** 2) - (width ** 2))
                 if x_coord > 0 and y_coord > 0: #going to upper left quadrant
-                    self.move_right(length)
+                    self.fly_right(length)
                     if y_coord > self.y_distance:
-                        self.move_forward(width)
+                        self.fly_forward(width)
                     else:
-                        self.move_back(width)
+                        self.fly_back(width)
                 elif x_coord < 0 and y_coord > 0: #going to lower left quadrant
-                    self.move_forward(length)
+                    self.fly_forward(length)
                     if y_coord > self.y_distance:
                         self.move.right(width)
                     else:
                         self.move.left(width)
                 elif x_coord > 0 and y_coord < 0: #going to upper right quadrant  
-                    self.move_back(length)
+                    self.fly_back(length)
                     if y_coord > self.y_distance:
-                        self.move_right(width)
+                        self.fly_right(width)
                     else:
-                        self.move_left(width)
+                        self.fly_left(width)
                 else: #going to lower right quadrant
-                    self.move_left(length)
+                    self.fly_left(length)
                     if y_coord > self.y_distance:
-                        self.move_forward(width)
+                        self.fly_forward(width)
                     else:
-                        self.move_back(width)
+                        self.fly_back(width)
             elif 180 < self.curr_degrees < 270 and self.x_distance == 0 and self.y_distance == 0: #flying to coordinates|drone is not moved and is rotated facing lower right quadrant
                 hypotenuse = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
                 beta = self.curr_degrees
@@ -481,29 +481,29 @@ class HighFlyers():
                 width = math.sin(theta) * hypotenuse
                 length = math.sqrt((hypotenuse ** 2) - (width ** 2))
                 if x_coord > 0 and y_coord > 0: #going to upper left quadrant
-                    self.move_back(length)
+                    self.fly_back(length)
                     if y_coord > self.y_distance:
-                        self.move_left(width)
+                        self.fly_left(width)
                     else:
-                        self.move_right(width) #HERE
+                        self.fly_right(width) #HERE
                 elif x_coord < 0 and y_coord > 0: #going to lower left quadrant
-                    self.move_left(length)
+                    self.fly_left(length)
                     if y_coord > self.y_distance:
-                        self.move_back(width)
+                        self.fly_back(width)
                     else:
-                        self.move_forward(width)
+                        self.fly_forward(width)
                 elif x_coord > 0 and y_coord < 0: #going to upper right quadrant  
-                    self.move_right(length)
+                    self.fly_right(length)
                     if x_coord > self.x_distance:
-                        self.move_back(width)
+                        self.fly_back(width)
                     else:
-                        self.move_forward(width)
+                        self.fly_forward(width)
                 else: #going to lower right quadrant
-                    self.move_forward(length)
+                    self.fly_forward(length)
                     if y_coord > self.y_distance:
-                        self.move_left(width)
+                        self.fly_left(width)
                     else:
-                        self.move_right(width)
+                        self.fly_right(width)
             elif 270 < self.curr_degrees < 360 and self.x_distance == 0 and self.y_distance == 0: #flying to coordinates|drone is not moved and is rotated facing upper right quadrant
                 hypotenuse = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
                 beta = self.curr_degrees
@@ -515,29 +515,29 @@ class HighFlyers():
                 width = math.sin(theta) * hypotenuse
                 length = math.sqrt((hypotenuse ** 2) - (width ** 2))
                 if x_coord > 0 and y_coord > 0: #going to upper left quadrant
-                    self.move_left(length)
+                    self.fly_left(length)
                     if y_coord > self.y_distance:
-                        self.move_forward(width)
+                        self.fly_forward(width)
                     else:
-                        self.move_back(width)
+                        self.fly_back(width)
                 elif x_coord < 0 and y_coord > 0: #going to lower left quadrant
-                    self.move_back(length)
+                    self.fly_back(length)
                     if y_coord > self.y_distance:
-                        self.move_left(width)
+                        self.fly_left(width)
                     else:
-                        self.move_right(width)
+                        self.fly_right(width)
                 elif self.x_distance > 0 and self.y_distance > 0: #going to upper right quadrant  
-                    self.move_forward(length)
+                    self.fly_forward(length)
                     if y_coord > self.y_distance:
-                        self.move_left(width)
+                        self.fly_left(width)
                     else:
-                        self.move_right(width)
+                        self.fly_right(width)
                 else: #going to lower right quadrant
-                    self.move_right(length)
+                    self.fly_right(length)
                     if y_coord > self.y_distance:
-                        self.move_back(width)
+                        self.fly_back(width)
                     else:
-                        self.move_forward(width)                     
+                        self.fly_forward(width)                     
             elif self.curr_degrees > 0 and self.x_distance > 0 and self.y_distance > 0: #flying to coordinates|drone is moved and rotated
                 hypotenuse = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
                 beta = self.curr_degrees
@@ -549,17 +549,17 @@ class HighFlyers():
                 width = math.sin(theta) * hypotenuse
                 length = math.sqrt((hypotenuse ** 2) - (width ** 2))
                 if 0 < self.curr_degrees < 180 and self.x_distance > 0 and self.y_distance > 0: #upper left quadrant
-                    self.move_back(length)
-                    self.move_left(width)
+                    self.fly_back(length)
+                    self.fly_left(width)
                 elif 0 < self.curr_degrees < 180 and self.x_distance < 0 and self.y_distance > 0: #lower left quadrant
-                    self.move_back(length)
-                    self.move_right(width)
+                    self.fly_back(length)
+                    self.fly_right(width)
                 elif 180 < self.curr_degrees < 360 and self.x_distance > 0 and self.y_distance > 0: #upper right quadrant
-                    self.move_back(length)
-                    self.move_right(width)
+                    self.fly_back(length)
+                    self.fly_right(width)
                 else: #lower right quadrant
-                    self.move_back(length)
-                    self.move_left(width)        
+                    self.fly_back(length)
+                    self.fly_left(width)        
         else: #direct flight
             if x_coord == 0 and y_coord == 0: #flying to home
                 distance_to = math.dist([self.x_distance, self.y_distance], [x_coord, y_coord])
@@ -568,23 +568,23 @@ class HighFlyers():
                     self.rotate_counter_clockwise(180)
                     angle_to = math.degrees(math.atan(self.y_distance/self.x_distance))
                     self.rotate_counter_clockwise(angle_to)
-                    self.move_forward(distance_to)
+                    self.fly_forward(distance_to)
                 elif self.x_distance > 0 and self.y_distance < 0: #upper right quadrant flying home
                     self.rotate_to_bearing(0)
                     self.rotate_counter_clockwise(90)
                     angle_to = 90 - math.atan(self.x_distance/self.y_distance)
                     self.rotate_counter_clockwise(angle_to)
-                    self.move_forward(distance_to)
+                    self.fly_forward(distance_to)
                 elif self.x_distance < 0 and self.y_distance < 0: #lower right quadrant flying home
                     self.rotate_to_bearing(0)
                     angle_to = 90 - math.atan(self.x_distance/self.y_distance)
                     self.rotate_counter_clockwise(angle_to)
-                    self.move_forward(distance_to)
+                    self.fly_forward(distance_to)
                 else: #lower left quadrant flying home
                     self.rotate_to_bearing(0)
                     angle_to = 90 - math.atan(self.x_distance/self.y_distance)
                     self.rotate_clockwise(angle_to)
-                    self.move_forward(distance_to)
+                    self.fly_forward(distance_to)
 
             else:
                 distance_to = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
@@ -592,19 +592,19 @@ class HighFlyers():
                 if x_coord > 0 and y_coord > 0: #flying to upper left quadrant
                     to_rotate = 90 - angle_to 
                     self.rotate_counter_clockwise(to_rotate)
-                    self.move_forward(distance_to)
+                    self.fly_forward(distance_to)
                 elif x_coord > 0 and y_coord < 0: #flying to upper right quadrant
                     to_rotate = 90 + angle_to
                     self.rotate_clockwise(to_rotate)
-                    self.move_forward(distance_to)
+                    self.fly_forward(distance_to)
                 elif x_coord < 0 and y_coord < 0: #flying to lower right quadrant
                     to_rotate = 180 + angle_to
                     self.rotate_counter_clockwise(to_rotate)
-                    self.move_forward(distance_to)
+                    self.fly_forward(distance_to)
                 else: #flying to lower left quadrant
                     to_rotate = 180 - angle_to
                     self.rotate_clockwise(to_rotate)
-                    self.move_forward(distance_to)
+                    self.fly_forward(distance_to)
             
 
     #------------------------- END OF HighFlyers CLASS ---------------------------
