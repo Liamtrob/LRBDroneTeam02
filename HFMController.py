@@ -152,7 +152,7 @@ class HighFlyers():
         self.drone.move_forward(int(cm))
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
             self.x_distance += round(abs(math.cos(math.radians(self.curr_degrees)) * cm),0)
-        elif 0 < self.curr_degrees < 180: #drone has rotated but is still facing left/positive y direction
+        elif 0 < self.curr_degrees <= 180: #drone has rotated but is still facing left/positive y direction
             self.x_distance -= round(abs(math.cos(math.radians(self.curr_degrees)) * cm),0)
         elif 180 < self.curr_degrees < 270: #drone has rotated and is facing lower right direction
             self.x_distance -= round(abs(math.cos(math.radians(self.curr_degrees)) * cm),0)
@@ -631,4 +631,25 @@ class HighFlyers():
         side_c = abs(math.sin(gamma) * (self.tether/math.sin(alpha)) if math.sin(alpha) > 0 else math.sin(gamma) * (self.tether/1))
 
         return side_c
+
+        def move_forward_long(self, distance):
+              while distance > 0:
+                  if distance - 500 > 0:
+                      distance -= 500
+                      self.move_forward(500)
+                  else:
+                      self.move_forward(distance)
+                      distance = 0
+
+        def move_track_curve(self):
+            self.move_forward_long(2313)
+            self.rotate_counter_clockwise(45)
+            self.move_forward_long(2313)
+            self.rotate_counter_clockwise(45)
+            self.move_forward_long(2313)
+            self.rotate_counter_clockwise(45)
+            self.move_forward_long(2313)
+            self.rotate_counter_clockwise(45)
+            self.move_forward_long(2313)
+
     #------------------------- END OF HighFlyers CLASS ---------------------------
