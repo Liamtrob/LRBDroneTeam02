@@ -31,8 +31,8 @@ log_settings = {
             'formatter': 'drone_stderr_fmt',
             'class': 'logging.StreamHandler',
             'stream': 'ext://sys.stderr',
-        },    
-    },    
+        },
+    },
     'formatters': {
         'drone_errfile_fmt': {
             'format': '%(asctime)s|%(levelname)s: %(message)s [%(name)s@%(filename)s.%(funcName)s.%(lineno)d]',
@@ -53,7 +53,7 @@ log_settings = {
 
 class HighFlyers():
     """
-    An interface from Team "Heads-Up Flight" to control a DJI Tello RoboMaster 
+    An interface from Team "Heads-Up Flight" to control a DJI Tello RoboMaster
     Drone. Inherits from the djitellopy.Tello class.
     """
 
@@ -65,7 +65,7 @@ class HighFlyers():
         Arguments
             drone_baseobject: A new djitellopy.Tello() object
             debug_level:      Set the desired logging level.
-                              logging.INFO shows every command and response 
+                              logging.INFO shows every command and response
                               logging.WARN will only show problems
                               There are other possibilities, see logging module
         """
@@ -111,7 +111,7 @@ class HighFlyers():
     def land(self):
         self.drone.land()
 
-    def pre_flight_check(self): 
+    def pre_flight_check(self):
         """checks to see if drone is above min operating power, if not, logs error and lands"""
         print(f"Current Battery Level: {self.get_battery()}")
         if self.drone.get_battery() <= self.params['min_operating_power']:
@@ -126,7 +126,7 @@ class HighFlyers():
         else:
             height = self.drone.get_height() - self.params['floor']
             self.drone.move_down(height)
-    
+
     def fly_to_mission_ceiling(self):
         self.pre_flight_check()
         height = self.drone.get_height()
@@ -145,7 +145,7 @@ class HighFlyers():
         self.pre_flight_check()
         self.drone.move_down(int(cm))
         self.log.info(f"Drone succesfully flew down {cm} cm")
-        
+
     #Fly forward/Fly Back min distance = 20cm
     def fly_forward(self, cm, home=False):
         self.pre_flight_check()
@@ -156,13 +156,13 @@ class HighFlyers():
             self.x_distance -= round(abs(math.cos(math.radians(self.curr_degrees)) * cm),0)
         elif 180 < self.curr_degrees < 270: #drone has rotated and is facing lower right direction
             self.x_distance -= round(abs(math.cos(math.radians(self.curr_degrees)) * cm),0)
-        
+
         if 0 < self.curr_degrees < 180: #drone is going left. adding to y distance
             self.y_distance += round(abs(math.sin(math.radians(self.curr_degrees)) * cm),0)
         elif 180 < self.curr_degrees < 360: #drone is going right. subtracting from y distance
             self.y_distance -= round(abs(math.sin(math.radians(self.curr_degrees)) * cm),0)
         self.log.info(f"Drone succesfully flew forward {cm} cm")
-        
+
     def fly_back(self,cm):
         self.pre_flight_check()
         self.drone.move_back(int(cm))
@@ -171,13 +171,13 @@ class HighFlyers():
             self.x_distance += round(abs(math.cos(math.radians(self.curr_degrees)) * cm),0)
         elif 0 < self.curr_degrees < 180: #drone has rotated but is still facing left/positive y direction
             self.x_distance -= round(abs(math.cos(math.radians(self.curr_degrees)) * cm),0)
-        
+
         if 0 < self.curr_degrees < 180:
             self.y_distance += round(abs(math.sin(math.radians(self.curr_degrees)) * cm),0)
         elif 180 < self.curr_degrees < 360:
             self.y_distance -= round(abs(math.sin(math.radians(self.curr_degrees)) * cm),0)
         self.log.info(f"Drone succesfully flew back {cm} cm")
-        
+
     def fly_left(self,cm):
         self.pre_flight_check()
         self.drone.move_left(int(cm))
@@ -186,13 +186,13 @@ class HighFlyers():
             self.x_distance += round(abs(math.cos(math.radians(angle)) * cm),0)
         elif 0 < self.curr_degrees < 180: #drone has rotated but is still facing left/positive y direction
             self.x_distance -= round(abs(math.cos(math.radians(angle)) * cm),0)
-        
+
         if 0 < self.curr_degrees < 180:
             self.y_distance += round(abs(math.sin(math.radians(angle)) * cm),0)
         elif 180 < self.curr_degrees < 360:
             self.y_distance -= round(abs(math.sin(math.radians(angle)) * cm),0)
         self.log.info(f"Drone succesfully flew left {cm} cm")
-        
+
     def fly_right(self,cm):
         self.pre_flight_check()
         self.drone.move_right(int(cm))
@@ -201,7 +201,7 @@ class HighFlyers():
             self.x_distance += round(abs(math.cos(math.radians(angle)) * cm),0)
         elif 0 < self.curr_degrees < 180: #drone has rotated but is still facing left/positive y direction
             self.x_distance -= round(abs(math.cos(math.radians(angle)) * cm),0)
-        
+
         if 0 < self.curr_degrees < 180:
             self.y_distance += round(abs(math.sin(math.radians(angle)) * cm),0)
         elif 180 < self.curr_degrees < 360:
@@ -251,7 +251,7 @@ class HighFlyers():
         cmd = f"EXT led {r} {g} {b}"
         self.drone.send_control_command(cmd)
         return
-            
+
 
     def top_led_off(self):
         """ Turn off the top LED. """
@@ -263,11 +263,11 @@ class HighFlyers():
 
     def matrix_pattern(self, flattened_pattern:str, color:str='b'):
         """
-        Show the flattened pattern on the LED matrix. The pattern should be 
+        Show the flattened pattern on the LED matrix. The pattern should be
         64 letters in a row with values either (r)ed, (b)lue, (p)urple, or (0)
         off. The first 8 characters are the top row, the next 8 are the second
         row, and so on.
-        
+
         Arguments
             flattened_pattern: see examples in dji_matrix.py
             color:             'r', 'b', or 'p'
@@ -282,7 +282,7 @@ class HighFlyers():
 
     def matrix_off(self):
         """ Turn off the 64 LED matrix. """
-        
+
         off_pattern = "0" * 64
         self.matrix_pattern(off_pattern)
         return
@@ -301,8 +301,8 @@ class HighFlyers():
     def get_temperature(self):
         """ Returns the drone's internal temperature in °F. """
         return self.drone.get_temperature()
-    
-        
+
+
     def go_to_floor(self, BAR_floor):
         if self.params['m_type'] == 'IRS':
             if self.drone.get_height() <= self.params['floor']:
@@ -327,7 +327,7 @@ class HighFlyers():
                 print('Bar - floor is', int((self.drone.get_barometer() - BAR_floor) - self.params['floor']))
                 self.drone.move_down(int((self.drone.get_barometer() - BAR_floor) - self.params['floor']))
                 print('DONE MOVING DOWN')
-    
+
     def go_to_ceiling(self, BAR_floor):
         if self.params['m_type'] == 'IRS': #m_type = measurement type , IR = Infrared Sensor
             if self.drone.get_height() >= self.params['ceiling']:
@@ -361,7 +361,7 @@ class HighFlyers():
             return int(round(self.y_distance,0))
         except Exception as excp:
             self.log.warning("Cannot round Y Distance to Whole Number")
-            
+
 
     @property
     def hypotenuse(self) -> int:
@@ -458,7 +458,7 @@ class HighFlyers():
                         self.move.right(width)
                     else:
                         self.move.left(width)
-                elif x_coord > 0 and y_coord < 0: #going to upper right quadrant  
+                elif x_coord > 0 and y_coord < 0: #going to upper right quadrant
                     self.fly_back(length)
                     if y_coord > self.y_distance:
                         self.fly_right(width)
@@ -492,7 +492,7 @@ class HighFlyers():
                         self.fly_back(width)
                     else:
                         self.fly_forward(width)
-                elif x_coord > 0 and y_coord < 0: #going to upper right quadrant  
+                elif x_coord > 0 and y_coord < 0: #going to upper right quadrant
                     self.fly_right(length)
                     if x_coord > self.x_distance:
                         self.fly_back(width)
@@ -526,7 +526,7 @@ class HighFlyers():
                         self.fly_left(width)
                     else:
                         self.fly_right(width)
-                elif self.x_distance > 0 and self.y_distance > 0: #going to upper right quadrant  
+                elif self.x_distance > 0 and self.y_distance > 0: #going to upper right quadrant
                     self.fly_forward(length)
                     if y_coord > self.y_distance:
                         self.fly_left(width)
@@ -537,11 +537,11 @@ class HighFlyers():
                     if y_coord > self.y_distance:
                         self.fly_back(width)
                     else:
-                        self.fly_forward(width)                     
+                        self.fly_forward(width)
             elif self.curr_degrees > 0 and self.x_distance > 0 and self.y_distance > 0: #flying to coordinates|drone is moved and rotated
                 hypotenuse = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
                 beta = self.curr_degrees
-                faux_x = self.x_distance 
+                faux_x = self.x_distance
                 faux_y = self.y_distance
                 alpha = math.atan( y_coord - faux_y / x_coord - faux_x)
                 theta = beta - alpha
@@ -559,7 +559,7 @@ class HighFlyers():
                     self.fly_right(width)
                 else: #lower right quadrant
                     self.fly_back(length)
-                    self.fly_left(width)        
+                    self.fly_left(width)
         else: #direct flight
             if x_coord == 0 and y_coord == 0: #flying to home
                 distance_to = math.dist([self.x_distance, self.y_distance], [x_coord, y_coord])
@@ -590,7 +590,7 @@ class HighFlyers():
                 distance_to = math.dist([x_coord, y_coord], [self.x_distance, self.y_distance])
                 angle_to = round(math.degrees(math.atan(x_coord/y_coord)), 0)
                 if x_coord > 0 and y_coord > 0: #flying to upper left quadrant
-                    to_rotate = 90 - angle_to 
+                    to_rotate = 90 - angle_to
                     self.rotate_counter_clockwise(to_rotate)
                     self.fly_forward(distance_to)
                 elif x_coord > 0 and y_coord < 0: #flying to upper right quadrant
@@ -605,6 +605,30 @@ class HighFlyers():
                     to_rotate = 180 - angle_to
                     self.rotate_clockwise(to_rotate)
                     self.fly_forward(distance_to)
-            
 
+    def tether_distance(self, direction):
+        if direction == "forward":
+            rotation_angle = self.curr_degrees
+            theta2 = rotation_angle
+
+        elif direction == "backward":
+            rotation_angle = self.curr_degrees
+            theta2 = rotation_angle + 180
+
+        elif direction == "left":
+            rotation_angle = self.curr_degrees
+            theta2 = rotation_angle + 90
+
+        else:
+            rotation_angle = self.curr_degrees
+            theta2 = rotation_angle + 270
+
+        theta1 = math.atan(self.y_distance / self.x_distance) if self.x_distance > 0 else math.atan(self.y_distance / 1)
+        alpha = abs(theta1 - theta2)
+        side_b = abs(math.dist((self.x_distance,self.y_distance),(0,0)))
+        beta = math.asin(side_b*(math.sin(alpha)/self.tether))
+        gamma = 180 - alpha - beta
+        side_c = abs(math.sin(gamma) * (self.tether/math.sin(alpha)) if math.sin(alpha) > 0 else math.sin(gamma) * (self.tether/1))
+
+        return side_c
     #------------------------- END OF HighFlyers CLASS ---------------------------
