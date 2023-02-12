@@ -661,4 +661,8 @@ class HighFlyers():
         self.rotate_counter_clockwise(45)
         self.move_forward_long(2313)
 
+    def flip_forward(self):
+        '''wrapper function for flip forward'''
+        self.flip_forward()
+
     #------------------------- END OF HighFlyers CLASS ---------------------------
