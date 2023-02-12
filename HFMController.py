@@ -1,7 +1,7 @@
 #Main controller File
 #!/usr/bin/env python3
-#High Flyers Mission 4
-#UPDATED 2/11/2023
+#High Flyers Drone Controller
+#UPDATED 2/12/2023
 
 import dji_matrix as djim
 import logging
@@ -146,7 +146,7 @@ class HighFlyers():
         self.drone.move_down(int(cm))
         self.log.info(f"Drone succesfully flew down {cm} cm")
 
-    #Fly forward/Fly Back min distance = 20cm
+    #Fly forward/Fly Back min distance = 20cm, max distance = 500cm
     def fly_forward(self, cm, home=False):
         self.pre_flight_check()
         self.drone.move_forward(int(cm))
@@ -391,6 +391,9 @@ class HighFlyers():
             self.rotate_clockwise(degrees_to_rotate)
 
     def fly_to_coordinates(self, x_coord, y_coord, direct_flight=False):
+        '''This function flies the drone to specific coordinates. There are two modes. Direct flight and "square" flight. 
+        In direct flight the drone will rotate and fly directly to the coordinates. In "square" mode the drone will fly 
+        forward/backward and left/right to reach the coordinates'''
         if direct_flight == False:
             if self.curr_degrees == 0 and self.x_distance == 0 and self.y_distance == 0: #flying to coordinates from start. drone is not rotated or moved
                 if x_coord > 0 and y_coord > 0: #coordinates are in upper left quadrant
@@ -607,6 +610,9 @@ class HighFlyers():
                     self.fly_forward(distance_to)
 
     def tether_distance(self, direction):
+        '''This function tethers the drone to a centerpoint with a maximum tether distance
+        that is set as a mission parameter. Note that the drone may not reach the exact tether amount
+        due to rounding.'''
         if direction == "forward":
             rotation_angle = self.curr_degrees
             theta2 = rotation_angle
@@ -628,28 +634,31 @@ class HighFlyers():
         side_b = abs(math.dist((self.x_distance,self.y_distance),(0,0)))
         beta = math.asin(side_b*(math.sin(alpha)/self.tether))
         gamma = 180 - alpha - beta
-        side_c = abs(math.sin(gamma) * (self.tether/math.sin(alpha)) if math.sin(alpha) > 0 else math.sin(gamma) * (self.tether/1))
+        side_c = abs(math.sin(gamma) * (self.params.tether/math.sin(alpha)) if math.sin(alpha) > 0 else math.sin(gamma) * (self.params.tether/1))
 
         return side_c
 
-        def move_forward_long(self, distance):
-              while distance > 0:
-                  if distance - 500 > 0:
-                      distance -= 500
-                      self.move_forward(500)
-                  else:
-                      self.move_forward(distance)
-                      distance = 0
+    def move_forward_long(self, distance):
+        '''This function allows the drone to fly forward more than the maximum 
+        distance of 500 centimeters'''
+        while distance > 0:
+            if distance - 500 > 0:
+                distance -= 500
+                self.fly_forward(500)
+            else:
+                self.fly_forward(distance)
+                distance = 0
 
-        def move_track_curve(self):
-            self.move_forward_long(2313)
-            self.rotate_counter_clockwise(45)
-            self.move_forward_long(2313)
-            self.rotate_counter_clockwise(45)
-            self.move_forward_long(2313)
-            self.rotate_counter_clockwise(45)
-            self.move_forward_long(2313)
-            self.rotate_counter_clockwise(45)
-            self.move_forward_long(2313)
+    def move_track_curve(self):
+        '''This function flies the drone along the curved side of an atheltic track'''
+        self.move_forward_long(2313)
+        self.rotate_counter_clockwise(45)
+        self.move_forward_long(2313)
+        self.rotate_counter_clockwise(45)
+        self.move_forward_long(2313)
+        self.rotate_counter_clockwise(45)
+        self.move_forward_long(2313)
+        self.rotate_counter_clockwise(45)
+        self.move_forward_long(2313)
 
     #------------------------- END OF HighFlyers CLASS ---------------------------
