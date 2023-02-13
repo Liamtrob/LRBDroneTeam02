@@ -632,7 +632,7 @@ class HighFlyers():
         theta1 = math.atan(self.y_distance / self.x_distance) if self.x_distance > 0 else math.atan(self.y_distance / 1)
         alpha = abs(theta1 - theta2)
         side_b = abs(math.dist((self.x_distance,self.y_distance),(0,0)))
-        beta = math.asin(side_b*(math.sin(alpha)/self.tether))
+        beta = math.asin(side_b*(math.sin(math.radians(alpha))/self.tether))
         gamma = 180 - alpha - beta
         side_c = abs(math.sin(gamma) * (self.params.tether/math.sin(alpha)) if math.sin(alpha) > 0 else math.sin(gamma) * (self.params.tether/1))
 
