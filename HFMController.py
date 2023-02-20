@@ -1,7 +1,7 @@
 #Main controller File
 #!/usr/bin/env python3
 #High Flyers Drone Controller
-#UPDATED 2/12/2023
+#UPDATED 2/19/2023
 
 import dji_matrix as djim
 import logging
@@ -10,6 +10,8 @@ import time
 import math
 import logging, logging.config
 from datetime import datetime
+import cv2
+import yolo
 
 #------------------------- BEGIN HighFlyers CLASS ----------------------------
 now = datetime.now().strftime("%Y%m%d.%H")
@@ -118,6 +120,9 @@ class HighFlyers():
             self.log.warning("Battery is below Min Operating Power. Drone will now Land.")
             self.drone.land()
 
+    def end(self):
+        self.end()
+
     def fly_to_mission_floor(self):
         self.pre_flight_check()
         height = self.drone.get_height()
@@ -149,6 +154,7 @@ class HighFlyers():
     #Fly forward/Fly Back min distance = 20cm, max distance = 500cm
     def fly_forward(self, cm, home=False):
         self.pre_flight_check()
+        cm = min(cm, self.tether_distance("forward"))
         self.drone.move_forward(int(cm))
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
             self.x_distance += round(abs(math.cos(math.radians(self.curr_degrees)) * cm),0)
@@ -165,6 +171,7 @@ class HighFlyers():
 
     def fly_back(self,cm):
         self.pre_flight_check()
+        cm = min(cm, self.tether_distance("backward"))
         self.drone.move_back(int(cm))
         angle = self.curr_degrees + 180
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
@@ -180,6 +187,7 @@ class HighFlyers():
 
     def fly_left(self,cm):
         self.pre_flight_check()
+        cm = min(cm, self.tether_distance("left"))
         self.drone.move_left(int(cm))
         angle = self.curr_degrees + 90
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
@@ -195,6 +203,7 @@ class HighFlyers():
 
     def fly_right(self,cm):
         self.pre_flight_check()
+        cm = min(cm, self.tether_distance("right"))
         self.drone.move_right(int(cm))
         angle = self.curr_degrees + 270
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
@@ -664,5 +673,50 @@ class HighFlyers():
     def flip_forward(self):
         '''wrapper function for flip forward'''
         self.flip_forward()
+    
+    def record_video(self, stop_thread_event, display_video_live=False):
+        '''This function records video from the drone. Person/Object detection using YOLO has also been incorporated'''
+        movie_name = 'drone_capture.avi'
+        movie_codec = cv2.VideoWriter_fourcc(*'mp4v')
+        movie_fps = 20
+        frame_wait = 1 / movie_fps
+        movie_size = (360, 240)
 
+        print("Thread started")
+        self.streamon()
+        camera = self.get_frame_read()
+        movie = cv2.VideoWriter(movie_name, movie_codec, movie_fps, movie_size, True)
+        time_prev = time.time()
+        if display_video_live:
+            cv2.namedWindow("Drone Video Feed")
+        print("Video feed started")
+        
+        while not stop_thread_event.isSet():
+
+            time_curr = time.time()
+            time_elapsed = time_curr - time_prev
+            if time_elapsed > frame_wait:
+                image = camera.frame
+                image = cv2.resize(image, movie_size)
+                if display_video_live:
+                    dnn_classifier, dnn_layers, label_names = yolo.load_yolo_deep_neural_network()
+                    dnn_object = (dnn_classifier, dnn_layers)
+                    confidence = 0.90
+                    threshold = 0.3
+                    img = yolo.process_image(image, dnn_object, confidence, threshold)
+                    cv2.imshow("Drone Video Feed", img)
+                cv2.waitKey(1)
+                movie.write(image)
+                time_prev = time_curr
+
+            if display_video_live:
+                cv2.waitKey(5)
+            else:
+                time.sleep(0.005)
+
+            print("Stopping video feed")
+            self.streamoff()
+            movie.release()
+            print("Thread finished")
+    
     #------------------------- END OF HighFlyers CLASS ---------------------------
