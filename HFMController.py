@@ -670,6 +670,14 @@ class HighFlyers():
         self.rotate_counter_clockwise(45)
         self.move_forward_long(2313)
 
+    def fly_track(self):
+        '''This function flies the drone around a standard atheltic track starting from the lower right at the beginning of the curve
+        if you're looking at the track from an aerial view.'''
+        self.move_track_curve() #fly around first curve of track
+        self.move_forward_long(8439) #fly on first straight of track
+        self.move_track_curve() #fly on second curve of track
+        self.move_forward_long(8439) #fly on second straight of track back to home
+
     def flip_forward(self):
         '''wrapper function for flip forward'''
         self.flip_forward()
