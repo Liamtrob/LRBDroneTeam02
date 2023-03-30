@@ -3,7 +3,6 @@
 #High Flyers Drone Controller
 #UPDATED 2/19/2023
 
-import dji_matrix as djim
 import logging
 from djitellopy import Tello
 import time
@@ -63,7 +62,6 @@ class HighFlyers():
         """
         Constuctor that establishes a connection with the drone. Pass in a new
         djitellopy Tello object give your HeadsUpTello object its wings.
-
         Arguments
             drone_baseobject: A new djitellopy.Tello() object
             debug_level:      Set the desired logging level.
@@ -154,7 +152,7 @@ class HighFlyers():
     #Fly forward/Fly Back min distance = 20cm, max distance = 500cm
     def fly_forward(self, cm, home=False):
         self.pre_flight_check()
-        cm = min(cm, self.tether_distance("forward"))
+        #cm = min(cm, self.tether_distance("forward"))
         self.drone.move_forward(int(cm))
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
             self.x_distance += round(abs(math.cos(math.radians(self.curr_degrees)) * cm),0)
@@ -171,7 +169,7 @@ class HighFlyers():
 
     def fly_back(self,cm):
         self.pre_flight_check()
-        cm = min(cm, self.tether_distance("backward"))
+        #cm = min(cm, self.tether_distance("backward"))
         self.drone.move_back(int(cm))
         angle = self.curr_degrees + 180
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
@@ -187,7 +185,7 @@ class HighFlyers():
 
     def fly_left(self,cm):
         self.pre_flight_check()
-        cm = min(cm, self.tether_distance("left"))
+        #cm = min(cm, self.tether_distance("left"))
         self.drone.move_left(int(cm))
         angle = self.curr_degrees + 90
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
@@ -203,7 +201,7 @@ class HighFlyers():
 
     def fly_right(self,cm):
         self.pre_flight_check()
-        cm = min(cm, self.tether_distance("right"))
+        #cm = min(cm, self.tether_distance("right"))
         self.drone.move_right(int(cm))
         angle = self.curr_degrees + 270
         if 0 <= self.curr_degrees < 90 or 270 < self.curr_degrees < 360: #drone has rotated but still facing forward direction
@@ -247,7 +245,6 @@ class HighFlyers():
         """
         Change the top LED to the specified color. The colors don't match the
         normal RGB palette very well.
-
         Arguments
             red:   0-255
             green: 0-255
@@ -276,7 +273,6 @@ class HighFlyers():
         64 letters in a row with values either (r)ed, (b)lue, (p)urple, or (0)
         off. The first 8 characters are the top row, the next 8 are the second
         row, and so on.
-
         Arguments
             flattened_pattern: see examples in dji_matrix.py
             color:             'r', 'b', or 'p'
@@ -400,8 +396,8 @@ class HighFlyers():
             self.rotate_clockwise(degrees_to_rotate)
 
     def fly_to_coordinates(self, x_coord, y_coord, direct_flight=False):
-        '''This function flies the drone to specific coordinates. There are two modes. Direct flight and "square" flight. 
-        In direct flight the drone will rotate and fly directly to the coordinates. In "square" mode the drone will fly 
+        '''This function flies the drone to specific coordinates. There are two modes. Direct flight and "square" flight.
+        In direct flight the drone will rotate and fly directly to the coordinates. In "square" mode the drone will fly
         forward/backward and left/right to reach the coordinates'''
         if direct_flight == False:
             if self.curr_degrees == 0 and self.x_distance == 0 and self.y_distance == 0: #flying to coordinates from start. drone is not rotated or moved
@@ -648,7 +644,7 @@ class HighFlyers():
         return side_c
 
     def move_forward_long(self, distance):
-        '''This function allows the drone to fly forward more than the maximum 
+        '''This function allows the drone to fly forward more than the maximum
         distance of 500 centimeters'''
         while distance > 0:
             if distance - 500 > 0:
@@ -670,6 +666,24 @@ class HighFlyers():
         self.rotate_counter_clockwise(45)
         self.move_forward_long(2313)
 
+    def move_court_corner(self):
+        self.move_forward_long(30)
+        self.rotate_counter_clockwise(30)
+        self.move_forward_long(30)
+        self.rotate_counter_clockwise(30)
+        self.move_forward_long(30)
+        self.rotate_counter_clockwise(30)
+
+    def fly_basketball_court(self):
+        self.move_court_corner()
+        self.move_forward_long(1000)
+        self.move_court_corner()
+        self.move_forward_long(2500)
+        self.move_court_corner()
+        self.move_forward_long(1000)
+        self.move_court_corner()
+        self.move_forward_long(2500)
+
     def fly_track(self):
         '''This function flies the drone around a standard atheltic track starting from the lower right at the beginning of the curve
         if you're looking at the track from an aerial view.'''
@@ -681,7 +695,7 @@ class HighFlyers():
     def flip_forward(self):
         '''wrapper function for flip forward'''
         self.flip_forward()
-    
+
     def record_video(self, stop_thread_event, display_video_live=False):
         '''This function records video from the drone. Person/Object detection using YOLO has also been incorporated'''
         movie_name = 'drone_capture.avi'
@@ -698,7 +712,7 @@ class HighFlyers():
         if display_video_live:
             cv2.namedWindow("Drone Video Feed")
         print("Video feed started")
-        
+
         while not stop_thread_event.isSet():
 
             time_curr = time.time()
@@ -726,5 +740,5 @@ class HighFlyers():
             self.streamoff()
             movie.release()
             print("Thread finished")
-    
+
     #------------------------- END OF HighFlyers CLASS ---------------------------
